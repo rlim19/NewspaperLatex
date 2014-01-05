@@ -1,0 +1,180 @@
+\documentclass{article}
+\usepackage{newspaper}
+\date{\today}
+\currentvolume{1}
+\currentissue{1}
+\usepackage{times, graphicx, multicols, caption, lettrine, hyperref, framed, lipsum}
+\hypersetup{colorlinks=true}
+
+%\usepackage{picinpar}
+\usepackage{wrapfig}
+
+%%%% quote %%%%
+\newcommand{\lowbiglquote}[1][70]{%
+  \setbox0=\hbox{\fontsize{#1}{0}\selectfont``}%
+  \setlength{\dimen0}{\ht0 - \heightof{A}}%
+  \noindent\llap{\smash{\lower\dimen0\box0 }}}
+
+\newcommand{\lowbigrquote}[1][70]{%
+  \setbox0=\hbox{\fontsize{#1}{0}\selectfont''}%
+  \setlength{\dimen0}{\ht0 - \heightof{A}}%
+  \unskip\rlap{\smash{\lower\dimen0\box0 }}}
+
+%%%% fancy quote %%%%
+\usepackage{tikz}
+\usetikzlibrary{backgrounds}
+\makeatletter
+
+\tikzset{%
+  fancy quotes/.style={
+    text width=\fq@width pt,
+    align=justify,
+    inner sep=1em,
+    anchor=north west,
+    minimum width=\textwidth,
+  },
+  fancy quotes width/.initial={.8\textwidth},
+  fancy quotes marks/.style={
+    scale=8,
+    text=white,
+    inner sep=0pt,
+  },
+  fancy quotes opening/.style={
+    fancy quotes marks,
+  },
+  fancy quotes closing/.style={
+    fancy quotes marks,
+  },
+  fancy quotes background/.style={
+    show background rectangle,
+    inner frame xsep=0pt,
+    background rectangle/.style={
+      fill=gray!25,
+      rounded corners,
+    },
+  }
+}
+
+\newenvironment{fancyquotes}[1][]{%
+\noindent
+\tikzpicture[fancy quotes background]
+\node[fancy quotes opening,anchor=north west] (fq@ul) at (0,0) {``};
+\tikz@scan@one@point\pgfutil@firstofone(fq@ul.east)
+\pgfmathsetmacro{\fq@width}{\textwidth - 2*\pgf@x}
+\node[fancy quotes,#1] (fq@txt) at (fq@ul.north west) \bgroup}
+{\egroup;
+\node[overlay,fancy quotes closing,anchor=east] at (fq@txt.south east) {''};
+\endtikzpicture}
+
+\makeatother
+
+%%%% wflettrine - dropcap in wrap environment %%%%
+\usepackage{helvet}\renewcommand{\familydefault}{\sfdefault}
+\usepackage{lettrine}
+\usepackage{wrapfig}
+\newcounter{cnt}\setcounter{cnt}{0}
+\def\t{\stepcounter{cnt}\thecnt. cat sat on the mat. }
+
+\newdimen\tttaa
+\newdimen\tttbb
+
+\renewcommand\thepage{\the\numexpr(\value{page}+1)/2\relax}
+
+\makeatletter
+\def\merge@ps{\afterassignment\merge@ps@\tttbb}
+
+\def\merge@ps@{\afterassignment\merge@ps@@\tttaa}
+
+
+\def\merge@ps@@{%
+\afterassignment\reset@WF@ps\dimen@\WF@ps\valign
+%\showthe\count@
+\ifnum\count@>\@ne
+\advance\count@\m@ne
+\expandafter\merge@ps
+\fi
+}
+
+
+\def\reset@WF@ps{\afterassignment\reset@WF@ps@\dimen@ii}
+
+\def\reset@WF@ps@#1\valign{%
+\edef\new@wf@ps{\new@wf@ps
+  \the\dimexpr\dimen@+\tttbb\relax\space
+  \the\dimexpr\dimen@ii-\tttbb\relax\space}%
+ \def\WF@ps{#1}}
+
+
+\newcommand\wflettrine[3][]{%
+  \setbox\tw@\hbox{\lettrine[#1]{#2}{#3}\global\let\gtmp\L@parshape}%
+  \afterassignment\wf@getoffset\count@\gtmp\hoffset
+  \setbox\WF@box\hbox{\kern-\dimen@\box\WF@box\kern\dimen@}%
+  \noindent\box\tw@
+    \def\new@wf@ps{}%
+    \afterassignment\merge@ps\count@\gtmp
+    \edef\WF@ps{\new@wf@ps\space\WF@ps}%
+    \@@parshape\c@WF@wrappedlines\WF@ps\z@\columnwidth}
+
+
+\def\wf@getoffset{\afterassignment\wf@get@ffset\dimen@}
+\def\wf@get@ffset#1\hoffset{}
+
+\makeatother
+
+%%%%%%%%%  Front matter   %%%%%%%%%%
+
+\begin{document}
+\maketitle
+
+\begin{multicols}{2}{
+
+
+\byline{\sc\Large TITLE}{Ricky Lim}
+
+
+\begin{wrapfigure}{r}{0.2\textwidth}
+    \vspace{-20pt}
+    \centering
+    \includegraphics[width=0.2\textwidth]{img/RlimOnMac.png}
+    \vspace{-20pt}
+    \caption*{{\small hello world}}
+  \vspace{-10pt}
+\end{wrapfigure}
+\wflettrine[lines=3]{H}{   }{ello world. This is a template for publishing blog posts from \href{http://randomwalk.us/}{randomwalk.us}  
+
+
+\headline{\it\Large Headline}
+\lipsum*[2]
+
+\lipsum[2]
+\bigskip
+\noindent
+\begin{minipage}{\linewidth}
+    \centering
+    \includegraphics[width=1.\textwidth]{img/MeetTheWalker.png}
+    \captionof{figure}{{\small Fancy Figure}}
+\end{minipage}
+
+\end{multicols}  
+\newpage
+
+%% a new page
+\begin{multicols}{2}
+\lipsum[3]
+\end{multicols}  
+
+\begin{fancyquotes}
+    \lipsum[4]
+\end{fancyquotes}
+
+\begin{multicols}{2}
+
+\begin{quotation}
+  \lowbiglquote {\small \textit{\lipsum[5]}}
+\end{quotation}
+
+
+\end{multicols}
+
+
+\end{document}
